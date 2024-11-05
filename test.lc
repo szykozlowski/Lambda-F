@@ -1,0 +1,8 @@
+/*
+Here you can put a program to test the interpreter.
+Outside the comments only one program is allowed.
+*/
+
+// (\x.x)a
+
+(\x.\y.y) a b
