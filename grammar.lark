@@ -13,5 +13,5 @@ NAME: /[a-z_][a-zA-Z0-9_]*/
 %import common.WS
 %ignore WS
 
-%ignore /\/\/[^\n]*/  // Single-line comment
-%ignore /\/\*[\s\S]*?\*\//  // Multi-line comment
+%ignore /\/\/[^\n]*/  
+%ignore /\/\*[\s\S]*?\*\//  
