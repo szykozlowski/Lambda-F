@@ -9,16 +9,30 @@ import os
 #  run/execute/interpret source code
 def interpret(source_code):
     cst = parser.parse(source_code)
+    
     ast = LambdaCalculusTransformer().transform(cst)
-    result_ast = evaluate(ast)
-    result = linearize(result_ast)
-    return result
+    
+    statements = ast if isinstance(ast, list) else [ast]
+    
+    results = []
+    for stmt in statements:
+        expr = stmt[1] if stmt[0] == 'statement' else stmt
+        results.append(linearize(evaluate(expr)))
+        
+    return " ;; ".join(str(x) for x in results)
 
 # convert concrete syntax to CST
 parser = Lark(open("grammar.lark").read(), parser='lalr')
 
 # convert CST to AST
 class LambdaCalculusTransformer(Transformer):
+    def start(self, args):
+        return args  # This will return the list of statements directly
+        
+    def statement(self, args):
+        expr, = args
+        return ('statement', expr)
+        
     def lam(self, args):
         name, body = args
         return ('lam', str(name), body)
@@ -72,6 +86,25 @@ class LambdaCalculusTransformer(Transformer):
     def rec(self, args):
         name, expr1, expr2 = args
         return ('let', (str(name)), ('fix',expr1), (expr2))
+
+    def statement(self, args):
+        expr, = args
+        return ('statement', expr)
+
+    def hd(self, args):
+        expr, = args
+        return ('hd', expr)
+
+    def tl(self, args):
+        expr, = args
+        return ('tl', expr)
+
+    def cons(self, args):
+        head, tail = args
+        return ('cons', head, tail)
+
+    def nil(self, args):
+        return ('nil',)
 
 # reduce AST to normal form
 def evaluate(tree):
@@ -133,6 +166,24 @@ def evaluate(tree):
     #     # Direct substitution of the 'fix' back into the function's body
     #     substituted_func = substitute(func_tree, func_tree[1], tree)
     #     return evaluate(substituted_func)
+
+    elif tree[0] == 'hd':
+        list_val = evaluate(tree[1])
+        if list_val[0] == 'cons':
+            result = evaluate(list_val[1])
+
+    elif tree[0] == 'tl':
+        list_val = evaluate(tree[1])
+        if list_val[0] == 'cons':
+            result = evaluate(list_val[2])
+
+    elif tree[0] == 'cons':
+        head = evaluate(tree[1])
+        tail = evaluate(tree[2])
+        result = ('cons', head, tail)
+
+    elif tree[0] == 'nil':
+        result = tree
 
     else:
         result = tree
@@ -223,6 +274,15 @@ def substitute(tree, name, replacement):
     elif tree[0] == 'fix':
         return ('fix', substitute(tree[1],name,replacement))
 
+    elif tree[0] == 'cons':
+        return ('cons', substitute(tree[1], name, replacement), substitute(tree[2], name, replacement))
+    elif tree[0] == 'hd':
+        return ('hd', substitute(tree[1], name, replacement))
+    elif tree[0] == 'tl':
+        return ('tl', substitute(tree[1], name, replacement))
+    elif tree[0] == 'nil':
+        return tree
+
     else:
         raise Exception('Unknown tree', tree)
     
@@ -236,23 +296,28 @@ def linearize(ast):
         return "(" + "\\" + str(ast[1]) + "." + str(linearize(ast[2])) + ")"
     elif ast[0] == 'app':
         return "(" + str(linearize(ast[1])) + " " + str(linearize(ast[2])) + ")"
+    elif ast[0] == 'nil':
+        return "#"
+    elif ast[0] == 'cons':
+        return f"({linearize(ast[1])}:{linearize(ast[2])})"
+    elif ast[0] == 'hd':
+        return f"(hd {linearize(ast[1])})"
+    elif ast[0] == 'tl':
+        return f"(tl {linearize(ast[1])})"
     else:
         return ast
 
 def main():
     import sys
     if len(sys.argv) != 2:
-        #print("Usage: python interpreter.py <filename or expression>", file=sys.stderr)
         sys.exit(1)
 
     input_arg = sys.argv[1]
 
     if os.path.isfile(input_arg):
-        # If the input is a valid file path, read from the file
         with open(input_arg, 'r') as file:
             expression = file.read()
     else:
-        # Otherwise, treat the input as a direct expression
         expression = input_arg
 
     result = interpret(expression)
