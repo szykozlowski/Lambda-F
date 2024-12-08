@@ -1,14 +1,36 @@
 ?start: exp
 
-?exp: "\\" NAME "." exp             -> lam
-      | exp1            
-?exp1: exp1 exp2                    -> app
+?exp: exp "+" exp1             -> plus
+      | exp "-" exp1          -> minus
+      | exp6 
+      | exp1
+
+?exp1: exp1 "*" exp2          -> mul
+      | exp1 "/" exp2         -> div
       | exp2
-?exp2: NAME                         -> var
+
+?exp2: "-" exp2               -> neg
+      | exp3
+
+?exp3: "\\" NAME "." exp             -> lam
+      | exp4   
+?exp4: exp4 exp5                    -> app
+      | exp5
+?exp5: NAME                         -> var
+      | NUMBER                      -> number
       | "(" exp ")"
 
-NAME: /[a-z_][a-zA-Z0-9_]*/         
-%import common.NUMBER
+?exp6: "if" exp "then" exp "else" exp -> if_
+      | exp "<=" exp                      -> leq
+      | exp "==" exp                      -> eq
+      | exp7
+
+?exp7: "let" NAME "=" exp "in" exp        -> let
+      | "letrec" NAME "=" exp "in" exp    -> rec
+      | "fix" exp                         -> fix
+
+NAME: /[a-z_][a-zA-Z0-9_]*/
+NUMBER: /\d+(\.\d+)?/    
 
 %import common.WS
 %ignore WS
