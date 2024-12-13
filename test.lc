@@ -3,8 +3,10 @@ Here you can put a program to test the interpreter.
 Outside the comments only one program is allowed.
 */
 
-// (\x.x)a
+//(\x.x)a
 
 // (\x.\y.y) a b
 
-let f = \x.x+1 in (f 1) : (f 2) : (f 3) : #
+//let f = \x.x+1 in (f 1) : (f 2) : (f 3) : #
+
+letrec f = \n. if n==0 then 1 else n*f(n-1) in f 4
