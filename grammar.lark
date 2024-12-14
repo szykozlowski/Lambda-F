@@ -10,7 +10,6 @@ start: statement+
       | exp8
 
 ?exp1: exp1 "*" exp2          -> mul
-      | exp1 "/" exp2         -> div
       | exp2
 
 ?exp2: "-" exp2               -> neg
@@ -18,15 +17,17 @@ start: statement+
 
 ?exp3: "\\" NAME "." exp             -> lam
       | exp4   
+
 ?exp4: exp4 exp5                    -> app
       | exp5
+
 ?exp5: NAME                         -> var
       | NUMBER                      -> number
       | "(" exp ")"
 
-?exp6: "if" exp "then" exp "else" exp -> if_
-      | exp "<=" exp                      -> leq
-      | exp "==" exp                      -> eq
+?exp6: "if" exp "==" exp "then" exp "else" exp -> if_eq
+      | "if" exp "<=" exp "then" exp "else" exp -> if_leq
+      | exp "==" exp                            -> eq_comp
       | exp7
 
 ?exp7: "let" NAME "=" exp "in" exp        -> let
