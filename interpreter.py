@@ -18,27 +18,12 @@ def interpret(source_code):
     results = []
     for stmt in statements:
         expr = stmt[1] if stmt[0] == 'statement' else stmt
-        print(rec_print(expr, 0))
         results.append(linearize(evaluate(expr, 0)))
         
     return " ;; ".join(str(x) for x in results)
 
 # convert concrete syntax to CST
 parser = Lark(open("grammar.lark").read(), parser='lalr')
-
-def rec_print(tree, depth):
-    tabs = depth * '  '
-    tabbed = False
-    for item in tree:
-        if isinstance(item, tuple):
-            print()
-            rec_print(item, depth + 1)
-        else:
-            if not tabbed:
-                print(f"{tabs}{item}", end=' ')
-                tabbed = True
-            else:
-                print(f"{item}", end=' ')
 
 # convert CST to AST
 class LambdaCalculusTransformer(Transformer):
@@ -120,6 +105,9 @@ class LambdaCalculusTransformer(Transformer):
     def nil(self, args):
         return ('nil',)
 
+    def eq_comp(self, args):
+        return ('eq_comp', args[0], args[1])
+
 # reduce AST to normal form
 def evaluate(tree, depth):
     print(f"{'\t' * depth}[ EVAL ]", tree)
@@ -157,7 +145,13 @@ def evaluate(tree, depth):
             result = evaluate(body, depth + 1)
         else:
             result = ('app', e1, e2)
-            
+    elif tree[0] == 'eq_comp':
+        val1 = evaluate(tree[1], depth + 1)
+        val2 = evaluate(tree[2], depth + 1)
+        if isinstance(val1, (int, float)) and isinstance(val2, (int, float)):
+            result = val1 == val2
+        else:
+            result = ('eq_comp', val1, val2)
     elif tree[0] == 'if_eq':
         val1 = evaluate(tree[1], depth + 1)
         val2 = evaluate(tree[2], depth + 1)
@@ -215,11 +209,15 @@ def evaluate(tree, depth):
         list_val = evaluate(tree[1], depth + 1)
         if list_val[0] == 'cons':
             result = evaluate(list_val[1], depth + 1)
+        else:
+            result = ('hd', list_val)
 
     elif tree[0] == 'tl':
         list_val = evaluate(tree[1], depth + 1)
         if list_val[0] == 'cons':
             result = evaluate(list_val[2], depth + 1)
+        else:
+            result = ('tl', list_val)
 
     elif tree[0] == 'cons':
         head = evaluate(tree[1], depth + 1)

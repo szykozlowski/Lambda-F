@@ -3,10 +3,21 @@ Here you can put a program to test the interpreter.
 Outside the comments only one program is allowed.
 */
 
-//(\x.x)a
+letrec map = \f. \xs. if xs==# then # else (f (hd xs)) : (map f (tl xs)) in (map (\x.x+1) (1:2:3:#))
+
+
 
 // (\x.\y.y) a b
 
 //let f = \x.x+1 in (f 1) : (f 2) : (f 3) : #
 
-letrec f = \n. if n==0 then 1 else n*f(n-1) in f 4
+//letrec f = \n. if n==0 then 1 else n*f(n-1) in f 4
+
+/*
+BROKEN
+(\x.x) #
+(\x.\y.x) 1:# a
+1:2 == 1:2
+1:2:# == 1:2:#
+letrec map = \f. \xs. if xs==# then # else (f (hd xs)) : (map f (tl xs)) in (map (\x.x+1) (1:2:3:#))
+*/

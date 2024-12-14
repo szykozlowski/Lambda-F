@@ -27,12 +27,12 @@ start: statement+
 
 ?exp6: "if" exp "==" exp "then" exp "else" exp -> if_eq
       | "if" exp "<=" exp "then" exp "else" exp -> if_leq
-      | exp "==" exp                            -> eq_comp
       | exp7
 
 ?exp7: "let" NAME "=" exp "in" exp        -> let
       | "letrec" NAME "=" exp "in" exp    -> rec
       | "fix" exp                         -> fix
+      | exp "==" exp                      -> eq_comp
 
 ?exp8: "hd" exp              -> hd
       | "tl" exp             -> tl
