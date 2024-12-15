@@ -8,7 +8,7 @@ import os
 
 #  run/execute/interpret source code
 def interpret(source_code):
-    print("Thinking... Give me a moment...")
+    # print("Thinking... Give me a moment...")
     cst = parser.parse(source_code)
     
     ast = LambdaCalculusTransformer().transform(cst)
