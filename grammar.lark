@@ -1,7 +1,9 @@
 start: statement+
 
 ?statement: exp ";;" -> statement
-         | exp      -> statement
+         | app_exp   -> statement
+
+?app_exp: exp (exp)*  -> make_app
 
 ?exp: exp1
 
@@ -17,22 +19,22 @@ start: statement+
       | exp4 "==" exp3        -> eq
       | exp4
 
-?exp4: "hd" exp4              -> hd
-      | "tl" exp4             -> tl
-      | exp5 ":" exp4         -> cons
-      | "#"                   -> nil
+?exp4: "if" exp "then" exp "else" exp -> if_
       | exp5
 
-?exp5: "if" exp "then" exp "else" exp -> if_
+?exp5: "-" exp5               -> neg
       | exp6
 
-?exp6: "-" exp6               -> neg
+?exp6: "\\" NAME "." exp      -> lam
       | exp7
 
-?exp7: "\\" NAME "." exp      -> lam
+?exp7: exp7 exp8              -> app
       | exp8
 
-?exp8: exp8 exp9              -> app
+?exp8: "hd" exp8              -> hd
+      | "tl" exp8             -> tl
+      | exp9 ":" exp8         -> cons
+      | "#"                   -> nil
       | exp9
 
 ?exp9: NAME                   -> var

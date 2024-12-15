@@ -27,6 +27,7 @@ parser = Lark(open("grammar.lark").read(), parser='lalr')
 # convert CST to AST
 class LambdaCalculusTransformer(Transformer):
     def start(self, args):
+        print(args)
         return args  # This will return the list of statements directly
         
     def lam(self, args):
@@ -85,7 +86,9 @@ class LambdaCalculusTransformer(Transformer):
 
     def statement(self, args):
         expr, = args
+        print(args)
         return ('statement', expr)
+
 
     def hd(self, args):
         expr, = args
@@ -101,6 +104,22 @@ class LambdaCalculusTransformer(Transformer):
 
     def nil(self, args):
         return ('nil',)
+
+    def multi_statement(self, args):
+        expr, rest = args
+        return [('statement', expr)] + (rest if isinstance(rest, list) else [('statement', rest)])
+
+    def single_statement(self, args):
+        expr, = args
+        return ('statement', expr)
+
+    def make_app(self, args):
+        if len(args) == 1:
+            return args[0]
+        result = args[0]
+        for arg in args[1:]:
+            result = ('app', result, arg)
+        return result
 
 # reduce AST to normal form
 def evaluate(tree):
