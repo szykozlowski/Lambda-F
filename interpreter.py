@@ -8,17 +8,18 @@ import os
 
 #  run/execute/interpret source code
 def interpret(source_code):
+    print("Thinking... Give me a moment...")
     cst = parser.parse(source_code)
     
     ast = LambdaCalculusTransformer().transform(cst)
-    print(ast)
+    # print(ast)
     statements = ast if isinstance(ast, list) else [ast]
     
     results = []
     for stmt in statements:
         expr = stmt[1] if stmt[0] == 'statement' else stmt
         results.append(linearize(evaluate(expr)))
-    print(results)   
+    # print(results)   
     return " ;; ".join(str(x) for x in results)
 
 # convert concrete syntax to CST
@@ -27,7 +28,7 @@ parser = Lark(open("grammar.lark").read(), parser='lalr')
 # convert CST to AST
 class LambdaCalculusTransformer(Transformer):
     def start(self, args):
-        print(args)
+        # print(args)
         return args  # This will return the list of statements directly
         
     def lam(self, args):
@@ -88,7 +89,7 @@ class LambdaCalculusTransformer(Transformer):
 
     def statement(self, args):
         expr, = args
-        print(args)
+        # print(args)
         return ('statement', expr)
 
 
@@ -125,11 +126,11 @@ class LambdaCalculusTransformer(Transformer):
 
 # reduce AST to normal form
 def evaluate(tree):
-    print(tree)
+    # print(tree)
     if isinstance(tree, (int, float, str)):
         result = tree
     elif tree[0] == 'app':
-        print("TREE " + str(tree))
+        # print("TREE " + str(tree))
         e1 = evaluate(tree[1])
 
         if e1[0] == 'lam':
@@ -166,7 +167,7 @@ def evaluate(tree):
             result = evaluate(_then)  # Evaluate the chosen branch
 
     elif tree[0] == 'eq':
-        print("\t" + str(tree))
+        # print("\t" + str(tree))
         result = (float)(evaluate(tree[1][1]) == evaluate(tree[2][1]))
 
     elif tree[0] == 'leq':
@@ -229,14 +230,14 @@ name_generator = NameGenerator()
 # for beta reduction (capture-avoiding substitution)
 # 'replacement' for 'name' in 'tree'
 def substitute(tree, name, replacement):
-    print("REPLACING " + str(name) + " WITH " + str(replacement) + " IN "+ str(tree))
-    print(tree)
+    # print("REPLACING " + str(name) + " WITH " + str(replacement) + " IN "+ str(tree))
+    # print(tree)
     # tree [replacement/name] = tree with all instances of 'name' replaced by 'replacement'
     if(isinstance(tree, float)):
         return tree
     elif tree[0] == 'var':
         if tree[1] == name:
-            print("GTTEM")
+            # print("GTTEM")
             return replacement # n [r/n] --> r
         else:
             return tree # x [r/n] --> x
@@ -267,7 +268,7 @@ def substitute(tree, name, replacement):
 
 
     elif tree[0] == 'if':
-        print(substitute(tree[1], name, replacement))
+        # print(substitute(tree[1], name, replacement))
         return ('if', substitute(tree[1], name, replacement), substitute(tree[2], name, replacement), substitute(tree[3], name, replacement))
 
     elif tree[0] == 'eq':
@@ -277,7 +278,7 @@ def substitute(tree, name, replacement):
         return ('leq', substitute(tree[1], name, replacement), substitute(tree[2], name, replacement))
 
     elif tree[0] == 'let':
-        print('\t' + str(tree))
+        # print('\t' + str(tree))
 
         if(name == tree[1]):
             tree = evaluate(tree)
@@ -286,7 +287,7 @@ def substitute(tree, name, replacement):
             return ('number',tree)
         return ('let', tree[1], substitute(tree[2], name, replacement), substitute(tree[3], name, replacement))
     elif tree[0] == 'rec':
-        print('\t' + str(tree))
+        # print('\t' + str(tree))
 
         if(name == tree[1]):
             tree = evaluate(tree)
