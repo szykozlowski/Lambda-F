@@ -5,10 +5,16 @@ start: statement+
 
 ?exp: exp "+" exp1             -> plus
       | exp "-" exp1          -> minus
+      | exp8
       | exp6 
       | exp1
-      | exp8
-
+      
+      
+?exp8: "hd" exp              -> hd
+      | "tl" exp             -> tl
+      | exp ":" exp          -> cons
+      | "#"                  -> nil
+      
 ?exp1: exp1 "*" exp2          -> mul
       | exp1 "/" exp2         -> div
       | exp2
@@ -33,14 +39,10 @@ start: statement+
       | "letrec" NAME "=" exp "in" exp    -> rec
       | "fix" exp                         -> fix
 
-?exp8: "hd" exp              -> hd
-      | "tl" exp             -> tl
-      | exp ":" exp          -> cons
-      | "#"                  -> nil
+
 
 NAME: /[a-z_][a-zA-Z0-9_]*/
 NUMBER: /\d+(\.\d+)?/    
-
 %import common.WS
 %ignore WS
 

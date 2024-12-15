@@ -11,14 +11,14 @@ def interpret(source_code):
     cst = parser.parse(source_code)
     
     ast = LambdaCalculusTransformer().transform(cst)
-    
+    print(ast)
     statements = ast if isinstance(ast, list) else [ast]
     
     results = []
     for stmt in statements:
         expr = stmt[1] if stmt[0] == 'statement' else stmt
         results.append(linearize(evaluate(expr)))
-        
+    print(results)   
     return " ;; ".join(str(x) for x in results)
 
 # convert concrete syntax to CST
@@ -150,7 +150,7 @@ def evaluate(tree):
 
     elif tree[0] == 'eq':
         print("\t" + str(tree))
-        result = (float)(tree[1][1] == tree[2][1])
+        result = (float)(evaluate(tree[1][1]) == evaluate(tree[2][1]))
 
     elif tree[0] == 'leq':
         result = (float)(tree[1][1] <= tree[2][1])
