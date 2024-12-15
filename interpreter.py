@@ -29,10 +29,6 @@ class LambdaCalculusTransformer(Transformer):
     def start(self, args):
         return args  # This will return the list of statements directly
         
-    def statement(self, args):
-        expr, = args
-        return ('statement', expr)
-        
     def lam(self, args):
         name, body = args
         return ('lam', str(name), body)
@@ -140,13 +136,13 @@ def evaluate(tree):
 
     elif tree[0] == 'if':
         _if = evaluate(tree[1])
-        _then = evaluate(tree[2])
-        _else = evaluate(tree[3])
+        _then = tree[2]  # Don't evaluate yet
+        _else = tree[3]  # Don't evaluate yet
 
         if _if == 0.0:  # False
-            result = ('var', _else)
+            result = evaluate(_else)  # Evaluate the chosen branch
         else:  # true
-            result = ('var', _then)
+            result = evaluate(_then)  # Evaluate the chosen branch
 
     elif tree[0] == 'eq':
         print("\t" + str(tree))
@@ -176,6 +172,8 @@ def evaluate(tree):
         list_val = evaluate(tree[1])
         if list_val[0] == 'cons':
             result = evaluate(list_val[2])
+        else:
+            result = tree
 
     elif tree[0] == 'cons':
         head = evaluate(tree[1])
