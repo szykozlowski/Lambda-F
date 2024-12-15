@@ -170,19 +170,14 @@ def evaluate(tree):
         result = (float)(evaluate(tree[1][1]) == evaluate(tree[2][1]))
 
     elif tree[0] == 'leq':
-        result = (float)(tree[1][1] <= tree[2][1])
+        left = evaluate(tree[1])
+        right = evaluate(tree[2])
+        if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+            return float(left <= right)
+        return ('leq', left, right)
 
     elif tree[0] == 'let':
         result = evaluate(substitute(tree[3], tree[1], (tree[2])))
-
-    # elif tree[0] == 'rec':
-    #     result = evaluate(substitute(tree[3], tree[1], (tree[2])))
-
-    # elif tree[0] == 'fix':
-    #     func_tree = tree[1]
-    #     # Direct substitution of the 'fix' back into the function's body
-    #     substituted_func = substitute(func_tree, func_tree[1], tree)
-    #     return evaluate(substituted_func)
 
     elif tree[0] == 'hd':
         list_val = evaluate(tree[1])

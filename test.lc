@@ -8,5 +8,18 @@ Outside the comments only one program is allowed.
 // (\x.\y.y) a b
 
 
-
-letrec f = \n. if n==0 then 0 else 1 + 2*(n-1) + f(n-1) in f 6
+letrec insert = \x.\xs.
+  if xs == # then
+    x : #
+  else if (x <= (hd xs)) then
+    x : xs
+  else
+    (hd xs) : (insert x (tl xs))
+in
+letrec sort = \xs.
+  if xs == # then
+    #
+  else
+    insert (hd xs) (sort (tl xs))
+in
+sort (5 : 3 : 4 : #)
