@@ -82,7 +82,9 @@ class LambdaCalculusTransformer(Transformer):
     
     def rec(self, args):
         name, expr1, expr2 = args
-        return ('let', (str(name)), ('fix',expr1), (expr2))
+        return ('let', str(name), 
+                ('fix', ('lam', str(name), expr1)), 
+                expr2)
 
     def statement(self, args):
         expr, = args
@@ -203,6 +205,13 @@ def evaluate(tree):
 
     elif tree[0] == 'nil':
         result = tree
+
+    elif tree[0] == 'fix':
+        func = evaluate(tree[1])
+        if func[0] == 'lam':
+            result = evaluate(('app', func, tree))
+        else:
+            result = ('fix', func)
 
     else:
         result = tree

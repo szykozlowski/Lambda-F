@@ -9,4 +9,4 @@ Outside the comments only one program is allowed.
 
 
 
-tl (1:2:#)
+letrec f = \n. if n==0 then 0 else 1 + 2*(n-1) + f(n-1) in f 6
