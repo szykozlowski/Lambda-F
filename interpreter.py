@@ -186,6 +186,8 @@ def evaluate(tree):
         list_val = evaluate(tree[1])
         if list_val[0] == 'cons':
             result = evaluate(list_val[1])
+        else:
+            result = tree
 
     elif tree[0] == 'tl':
         list_val = evaluate(tree[1])
