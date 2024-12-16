@@ -11,6 +11,7 @@ This repositor contains a functioning interpreter for lambda calculus written in
 - Operations on Lists (head, tail, conc)
 - Fixed-Point Recursion
 - Assignment (let x = 1)
+- Delimiting (;\;)
 
 ## How to Run
 
