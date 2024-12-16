@@ -1,11 +1,17 @@
 # Lambda Calculus Interpreter in Python
 
-This repository is essentially a fork of [alexhkurz/lambdaC-2024](https://codeberg.org/alexhkurz/lambdaC-2024) with some minor modifications.
+This repositor contains a functioning interpreter for lambda calculus written in python.  grammar.lark contains the rules for the grammar/helps create the ast, and interpreter.py is where the ast is evaluated.
 
-It will serve as our starting point to develop a small functional programming language in three milestones.
+## Capabilities
 
-For installation etc see the original README at [alexhkurz/lambdaC-2024](https://codeberg.org/alexhkurz/lambdaC-2024/README.md).
-  
-The only change to the original code is that `grammar.lark`  has been modified so that comments now do not start with `--` but with `//` to accommodate "double minus" for arithmetic.
+- Basic Arithmetic (+ - *)
+- Lambda Calculus Expressions
+- Conditionals (if then else)
+- Equalities (== <=)
+- Operations on Lists (head, tail, conc)
+- Fixed-Point Recursion
+- Assignment (let x = 1)
 
-See [here](https://hackmd.io/@alexhkurz/rJZJb7tekx) for details of the programming assignment 4 for the course "Programming Languages 2024".
+## How to Run
+
+> python interpreter.py test.lc
